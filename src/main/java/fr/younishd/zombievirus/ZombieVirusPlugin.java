@@ -94,21 +94,18 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-        if (e.getDamager() instanceof Player &&
+        if (((e.getDamager() instanceof Player &&
                 e.getEntity() instanceof Player &&
                 this.isZombie((Player) e.getDamager()) &&
-                !this.isZombie((Player) e.getEntity())) {
+                !this.isZombie((Player) e.getEntity())) ||
+                (e.getEntity() instanceof Player &&
+                        e.getDamager().getType() == EntityType.ZOMBIE &&
+                        !this.isZombie((Player) e.getEntity()))) &&
+                new Random().nextFloat() < ZOMBIE_INFECTION_PROB) {
 
+            // 0.2 chance to get infected
             this.zombies.add((Player) e.getEntity());
             this.zombify((Player) e.getEntity());
-        } else if (e.getEntity() instanceof Player &&
-                e.getDamager().getType() == EntityType.ZOMBIE &&
-                !this.isZombie((Player) e.getEntity())) {
-
-            if (new Random().nextFloat() < ZOMBIE_INFECTION_PROB) {
-                this.zombies.add((Player) e.getEntity());
-                this.zombify((Player) e.getEntity());
-            }
         }
     }
 
