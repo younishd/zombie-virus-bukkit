@@ -2,6 +2,7 @@ package fr.younishd.zombievirus;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -34,6 +35,7 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
     private static final float ZOMBIE_INFECTION_PROB = 0.2f;
 
     private List<Player> zombies;
+    private Player compassTarget;
 
     @Override
     public void onEnable() {
@@ -52,6 +54,21 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
                         EntityType.ZOMBIE);
             }
         }, 0, 20 * 10);
+
+        scheduler.scheduleSyncRepeatingTask(this, () -> {
+            if (this.compassTarget != null) {
+                for (Player p : this.zombies) {
+                    p.setCompassTarget(this.compassTarget.getLocation());
+                }
+            }
+
+            for (Player p : this.zombies) {
+                if (p.getLocation().getBlock().getRelative(0, 1, 0).getLightFromSky() > 7 &&
+                        p.getLocation().getBlock().getRelative(0, 1, 0).getLightLevel() > 7) {
+                    p.setFireTicks(20);
+                }
+            }
+        }, 0, 20);
     }
 
     @Override
@@ -89,6 +106,37 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
 
             return true;
         }
+
+        if (cmd.getName().equalsIgnoreCase("compass")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("Compass can only be set as a player.");
+                return false;
+            }
+
+            if (args.length != 1) {
+                sender.sendMessage("Wrong number of arguments.");
+                return false;
+            }
+
+            boolean found = false;
+            Player player = null;
+            for (Player p : this.getServer().getOnlinePlayers()) {
+                if (p.getName().equals(args[0])) {
+                    found = true;
+                    player = p;
+                    sender.sendMessage("Compass now pointing at " + p.getName() + ".");
+                    break;
+                }
+            }
+            if (!found) {
+                sender.sendMessage("No such player online.");
+                return false;
+            }
+
+            this.compassTarget = player;
+            return true;
+        }
+
         return false;
     }
 
@@ -187,6 +235,8 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
         sword.addEnchantment(VANISHING_CURSE, 1);
         p.getInventory().addItem(sword);
 
+        p.getInventory().addItem(new ItemStack(Material.COMPASS));
+
         p.setFoodLevel(MIN_FOOD_LEVEL);
 
         this.refreshPotions(p);
@@ -204,7 +254,7 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
     private void refreshPotions(Player p) {
         p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 20 * 30, new Random().nextInt(5 - 1 + 1) + 1), true);
         if (new Random().nextBoolean()) {
-            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, new Random().nextInt(2 + 1)), true);
+            p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20 * 30, new Random().nextInt(4 + 1)), true);
         } else {
             p.removePotionEffect(PotionEffectType.SLOW);
         }

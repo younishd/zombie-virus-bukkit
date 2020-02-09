@@ -6,3 +6,6 @@ commands:
   zombie:
     description: Infect a player.
     usage: /zombie [player]
+  compass:
+    description: Set compass target.
+    usage: /compass [player]
