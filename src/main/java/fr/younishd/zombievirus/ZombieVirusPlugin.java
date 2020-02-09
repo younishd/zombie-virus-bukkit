@@ -63,7 +63,7 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
             }
 
             for (Player p : this.zombies) {
-                if (p.getLocation().getBlock().getRelative(0, 1, 0).getLightFromSky() > 7 &&
+                if (p.getLocation().getBlock().getRelative(0, 1, 0).getLightFromSky() == 15 &&
                         p.getLocation().getBlock().getRelative(0, 1, 0).getLightLevel() > 7) {
                     p.setFireTicks(20);
                 }
@@ -73,7 +73,7 @@ public class ZombieVirusPlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        for (Player p : this.zombies) p.setHealth(0);
+        //for (Player p : this.zombies) p.setHealth(0);
 
         this.getLogger().info("Bye.");
     }
