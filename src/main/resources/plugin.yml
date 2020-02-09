@@ -1,0 +1,8 @@
+name: ZombieVirusPlugin
+main: fr.younishd.zombievirus.ZombieVirusPlugin
+version: ${version}
+author: neoprene
+commands:
+  zombie:
+    description: Infect a player.
+    usage: /zombie [player]
